@@ -82,9 +82,6 @@ def send_conf(num, nmod = 0, tipo='trg'):
         send_config(config,nmod,tipo)    
     else:
         raise ValueError('formato o tipo invalido')
-def send_conf_list(nums, mods, tipo = 'trg'):
-    for n,num in enumerate(nums):
-        send_conf(num, nmod = [mods[n]], tipo)
 
 def send_conf_delay(conflist, delays, nmod = 0, tipo = 'trg', loop =0):
     """ envia la secuencia de conifguracion que esta en conflist (numeros)
