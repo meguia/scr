@@ -19,7 +19,7 @@ from pythonosc import udp_client
 iplist = ['192.168.0.11','192.168.0.12','192.168.0.13','192.168.0.14','192.168.0.15']
 port = 8000
 # dict osc commands
-osc_tipo = {'pos':'/setPosition/', 'trg':'/setTarget/', 'vel':'/setVelocity/', ' acl':'/setAcceleration/', 'rgb':'/setColor/'}
+osc_tipo = {'pos':'/setPosition/', 'trg':'/setTarget/', 'vel':'/setVelocity/', 'acl':'/setAcceleration/', 'rgb':'/setColor/'}
 file_tipo = {'pos':'trg', 'trg':'trg', 'vel':'vel', 'acl':'acl', 'rgb':'rgb'}
 path = '../data/' 
 
@@ -128,6 +128,28 @@ def send_conf_random(nmod = 0, tipo = 'trg'):
     else:
         config = np.random.randint(1, 255, size = (5,20))
     send_config(config,nmod,tipo)
+
+def send_rand_mask(nid,delay, nmask=0, nmod=0, tipo='trg'):
+        """Envia la configuracion nid pero eligiendo columnas al azar para
+        cada arduino en secuencia desde 1 hasta nmask con delay"""
+        z = np.zeros((5,20),dtype=np.int32)
+        for n in range(5):
+            for m in range(4):
+                z[n][m*5:(m+1)*5] = np.random.permutation(5)
+        config = load_conf(nid,None,tipo)
+        for n in nmask:
+            config_p = config*(z==n)
+            send_config(config_p, nmod, tipo)
+            time.sleep(delay)
+
+def make_conf_random(nid, tipo = 'trg'):
+    """ arma una configuracion random y la almacena en nid
+    """
+    if tipo is 'rgb':
+        npdata = np.random.randint(1,255,(5,20,4))
+    else:
+        npdata = np.random.randint(1,255,(5,20))
+    save_conf(npdata,nid,None,tipo)
 
 def make_conf(value, nid, nseq=None, clase='same', mod = 0, tipo='trg'):
     """arma una configuracion para uno o varios modulos 
