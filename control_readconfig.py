@@ -9,9 +9,9 @@ from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
 # Tipos de configuracionn
-# xxx_zzzz.json
+# xxx_yy_zz.json
 # xxx se refiere al tipo de dato (trg,vel,acl,rgb) 
-# zzzz es el identificador unico de configuracion (entero)
+# yy es el identificador unico de configuracion (entero) y zz el indice en la secuencia
 # /trg /pos /vel /acl /targets/posiciones/velocidades/aceleraciones de motores nparray de 5 x 20
 # rgb imagen para leds nparray de 5 x 20 x 3
 
@@ -23,27 +23,48 @@ osc_tipo = {'pos':'/setPosition/', 'trg':'/setTarget/', 'vel':'/setVelocity/', '
 file_tipo = {'pos':'trg', 'trg':'trg', 'vel':'vel', 'acl':'acl', 'rgb':'rgb'}
 path = '../data/' 
 
-def save_conf(npdata, num, tipo='pos'):
+def byte_to_angle(value):
+    return np.rint(90*(value-128)/86).astype(int)
+
+def angle_to_byte(value):
+    return np.clip(np.rint(86*value/90+128),1,255).astype(int)
+
+
+def save_conf(npdata, nid, nseq=None, tipo='trg'):
     """guarda una configuracion 
     tipo 'trg' 'rgb' 'pos' 'vel' o 'acl'
-    numero identificacion entero positivo
+    numero identificacion entero positivo nid
+    si es una secuencia nseq indica el indice
     npdata array 2D o 3D (led)
     """
     print(npdata)
-    fname = path + file_tipo[tipo] + '_' + str(num).zfill(4) + '.json'
+    if nseq:
+        fname = path + file_tipo[tipo] + '_' + str(nid).zfill(2) + '_' + str(nseq).zfill(2) + '.json'
+    else:
+        fname = path + file_tipo[tipo] + '_' + str(nid).zfill(4) + '.json'
     with open(fname, 'w') as outfile:  
             json.dump(npdata, outfile, cls=NumpyEncoder)   
 
-def load_conf(num, tipo= 'trg'):
+def load_conf(nid, nseq=None, tipo= 'trg'):
     """carga configuracion de archivo json 
     devuelve array numpy
     """
-    fname = path + file_tipo[tipo] + '_' + str(num).zfill(4) + '.json'
+    if nseq:
+        fname = path + file_tipo[tipo] + '_' + str(nid).zfill(2) + '_' + str(nseq).zfill(2) + '.json'
+    else:
+        fname = path + file_tipo[tipo] + '_' + str(nid).zfill(4) + '.json'
     with open(fname) as json_file:  
         npdata = json.load(json_file, object_hook=json_numpy_obj_hook)
         #perform someformat chequeo 
-    print(npdata)
     return npdata
+
+def print_conf(nid, nmod=0, nseq=None, tipo='trg'):
+    npdata = load_conf(nid,nseq,tipo)
+    if tipo is 'trg'or tipo is 'pos':
+        npdata = byte_to_angle(npdata)
+    data = np.reshape(npdata[nmod],(4,5))
+    print(data)    
+
 
 def send_config(config, nmod, tipo):
     """ envia una configuracion config a los modulos en la lista nmod
@@ -72,37 +93,43 @@ def send_config(config, nmod, tipo):
     else:
         raise ValueError('Configuracion con formato incorrecto')
 
-def send_conf(num, nmod = 0, tipo='trg'):
+def send_conf(nid, nseq=None, nmod = 0, tipo='trg'):
     """ envia la configuracion almacendad en archivo con numero num
     a los modulso en la lista nmod si nmod es 0 lo envia a todos
     tipo es trg pos vel acl o rgb
     """
     if tipo in osc_tipo.keys():
-        config = load_conf(num,tipo)
+        config = load_conf(nid,nseq,tipo)
         send_config(config,nmod,tipo)    
     else:
         raise ValueError('formato o tipo invalido')
 
 def send_conf_list(nums, mods, tipo = 'trg'):
     for n,num in enumerate(nums):
-        send_conf(num, [mods[n]], tipo)
+        send_conf(num, None, [mods[n]], tipo)
 
-def send_conf_delay(conflist, delays, nmod = 0, tipo = 'trg', loop =0):
+def send_conf_delay(nid, delays, nmod = 0, tipo = 'trg', loop =0):
     """ envia la secuencia de conifguracion que esta en conflist (numeros)
     en los intervalos dados por delays (valor fijo o lista)
     los otros parametros son los mismos que send_con
     si loop = 1 lo repite forever
     """
-    for n,num in enumerate(conflist):
-        send_conf(num, nmod, tipo)
-        time.sleep(delays[n])
+    for n,ndel in enumerate(delays):
+        send_conf(nid, n+1, nmod, tipo)
+        time.sleep(ndel)
     while(loop):
-        for n,num in enumerate(conflist):
-            send_conf(num, nmod, tipo)
-            time.sleep(delays[n])
+        for n,ndel in enumerate(delays):
+            send_conf(nid, n+1, nmod, tipo)
+            time.sleep(ndel)
 
+def send_conf_random(nmod = 0, tipo = 'trg'):
+    if tipo is 'rgb':
+        config = np.random.randint(1, 255, size = (5,20,4))
+    else:
+        config = np.random.randint(1, 255, size = (5,20))
+    send_config(config,nmod,tipo)
 
-def make_conf(num, value, clase='same', mod = 0, tipo='trg'):
+def make_conf(value, nid, nseq=None, clase='same', mod = 0, tipo='trg'):
     """arma una configuracion para uno o varios modulos 
     y la almacena en el archivo dado por num
     clase puede ser:
@@ -135,4 +162,4 @@ def make_conf(num, value, clase='same', mod = 0, tipo='trg'):
             for r in range(5):
                 npdata[m][r:20:10] = value[2*r]
                 npdata[m][r+5:20:10] = value[2*r+1]
-    save_conf(npdata,num,tipo)
+    save_conf(npdata,nid,nseq,tipo)
