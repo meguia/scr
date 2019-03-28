@@ -1,11 +1,16 @@
 """:
 """
-import argparse
+# import argparse
 import numpy as np
 import json
 import time
-from pythonosc import osc_message_builder
+# from pythonosc import osc_message_builder
 from pythonosc import udp_client
+from matplotlib.patches import Polygon
+from matplotlib.collections import PatchCollection
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from itertools import product
 
 # Tipos de configuracionn
 # xxx_yy_zz.json
@@ -20,6 +25,17 @@ port = 8000
 # dict osc commands
 osc_tipo = {'pos': '/setPosition/', 'trg': '/setTarget/', 'vel': '/setVelocity/', ' acl': '/setAcceleration/', 'rgb': '/setColor/'}
 file_tipo = {'pos': 'trg', 'trg': 'trg', 'vel': 'vel', 'acl': 'acl', 'rgb': 'rgb'}
+
+n_rows = 5
+n_columns = 4
+
+w = 0.25
+d = 0.05
+s = 1.2
+ucoord_base = [(-w - d, w + d), (-w - d, -w - d), (w + d, -w - d), (w + d, w + d),
+               (w - d, w + d), (w - d, -w + d), (-w + d, -w + d), (-w + d, w + d)]
+
+ij = list(product(range(n_columns), range(n_rows)))
 
 
 def byte_to_angle(value):
@@ -140,6 +156,30 @@ def load_and_send_config(filename, nmod=0):
 #         send_config(config, nmod, tipo)
 #     else:
 #         raise ValueError('formato o tipo invalido')
+
+
+def plot_scr(trg_values, n_modules=5):
+
+    fig, ax = plt.subplots(figsize=(32, 8))
+
+    u_idx = -1
+    for k in range(n_modules):
+        polygons = []
+        for i, j in ij:
+            u_idx += 1
+            p = Polygon(ucoord_base, True)
+            r = mpl.transforms.Affine2D().rotate(byte_to_angle(trg_values[u_idx]))
+            t = mpl.transforms.Affine2D().translate(j + k * (n_modules + 1), i)
+            tra = r + t
+            p.set_transform(tra)
+            polygons.append(p)
+        patch = PatchCollection(polygons)
+        patch.set_color([0, 0, 0])
+        ax.add_collection(patch)
+    plt.axis('off')
+    plt.ylim(-1, n_columns)
+    plt.xlim(-1, (n_rows + 1) * n_modules - 1)
+    plt.gca().set_aspect('equal', 'box')
 
 
 def send_conf_list(nums, mods, tipo='trg'):
