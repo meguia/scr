@@ -21,7 +21,7 @@ port = 8000
 # dict osc commands
 osc_tipo = {'pos':'/setPosition/', 'trg':'/setTarget/', 'vel':'/setVelocity/', 'acl':'/setAcceleration/', 'rgb':'/setColor/'}
 file_tipo = {'pos':'trg', 'trg':'trg', 'vel':'vel', 'acl':'acl', 'rgb':'rgb'}
-path = '../data/' 
+path = './data/' 
 
 def byte_to_angle(value):
     return np.rint(90*(value-128)/86).astype(int)
@@ -60,7 +60,7 @@ def load_conf(nid, nseq=None, tipo= 'trg'):
 
 def print_conf(nid, nmod=0, nseq=None, tipo='trg'):
     npdata = load_conf(nid,nseq,tipo)
-    if tipo is 'trg'or tipo is 'pos':
+    if tipo == 'trg'or tipo == 'pos':
         npdata = byte_to_angle(npdata)
     data = np.reshape(npdata[nmod],(4,5))
     print(data)    
@@ -75,7 +75,7 @@ def send_config(config, nmod, tipo):
         modlist = [iplist[n] for n in nmod]
     else:
         modlist = iplist
-    if type(config) is np.ndarray:
+    if type(config) == np.ndarray:
         if config.shape[:2] != (5, 20):
             raise ValueError('Configuracion no consistente con el formato')
         else:
@@ -123,7 +123,7 @@ def send_conf_delay(nid, delays, nmod = 0, tipo = 'trg', loop =0):
             time.sleep(ndel)
 
 def send_conf_random(nmod = 0, tipo = 'trg'):
-    if tipo is 'rgb':
+    if tipo == 'rgb':
         config = np.random.randint(1, 255, size = (5,20,4))
     else:
         config = np.random.randint(1, 255, size = (5,20))
@@ -145,7 +145,7 @@ def send_rand_mask(nid,delay, nmask=0, nmod=0, tipo='trg'):
 def make_conf_random(nid, tipo = 'trg'):
     """ arma una configuracion random y la almacena en nid
     """
-    if tipo is 'rgb':
+    if tipo == 'rgb':
         npdata = np.random.randint(1,255,(5,20,4))
     else:
         npdata = np.random.randint(1,255,(5,20))
@@ -161,26 +161,26 @@ def make_conf(value, nid, nseq=None, clase='same', mod = 0, tipo='trg'):
     col12: lista de 8 valores por columnas pero para filas par/impar
     row12: lista de 10 valores por fila pero para columnas par/impar
     """
-    if tipo is 'rgb':
+    if tipo == 'rgb':
         npdata = np.zeros((5,20,4), dtype = np.int32)
     else:
         npdata = np.zeros((5,20), dtype = np.int32)
     if mod == 0:
         modlist = range(5)
     for m in modlist:
-        if clase is 'same':
+        if clase == 'same':
             npdata[m] = value
-        elif clase is 'col':
+        elif clase == 'col':
             for c in range(4):
                 npdata[m][5*c:5*(c+1)] = value[c]
-        elif clase is 'row':
+        elif clase == 'row':
             for r in range(5):
                 npdata[m][r:20:5] = value[r]
-        elif clase is 'col12':
+        elif clase == 'col12':
             for c in range(4):
                 npdata[m][5*c:5*(c+1)] = value[2*c]
                 npdata[m][5*c+1:5*(c+1)] = value[2*c+1]     
-        elif clase is 'row12':
+        elif clase == 'row12':
             for r in range(5):
                 npdata[m][r:20:10] = value[2*r]
                 npdata[m][r+5:20:10] = value[2*r+1]
