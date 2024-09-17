@@ -13,6 +13,7 @@ class Strobo {
 		ColorWheel w = (ColorWheel)cp5.get("colorWheel");
 	    for (int i = 0; i < 20; i++) {
 	        modulos[cristalIdx][i].c = w.getRGB();
+	        modulos[cristalIdx][i].t = 0;
 	    }
 	    sendMessage = true;
 	    inUse = true;
@@ -24,6 +25,7 @@ class Strobo {
 		if (inUse && millis() > final_strobo) {
 		    for (int i = 0; i < 20; i++) {
 		        modulos[cristalIdx][i].c = color(0);
+		        modulos[cristalIdx][i].t = 0;
 		    }
 		    sendMessage = true;
 		    inUse = false;

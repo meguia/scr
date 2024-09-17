@@ -1,6 +1,7 @@
 class Columna {
 	int x, y, idx;
 	color c;
+	int t;
 
 	Columna() {
 
@@ -10,6 +11,7 @@ class Columna {
 		idx = _idx;
 		x = idx / 5;
 		y = idx % 5;
+		t = 0;
 	}
 
 	void draw(PGraphics pg) {

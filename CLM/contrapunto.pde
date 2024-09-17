@@ -20,17 +20,6 @@ class Contrapunto extends AppBase {
 	  }
 
 	@Override public void draw() {
-	    background(0);		
-	    for (int q = 0; q < 5; q++) {
-	    	if (q+1==modulo) fill(128);
-	    	else fill(0);
-	        for (int j = 0; j < 4; j++) {
-		      for (int i = 0; i < 5; i++) {
-					rect(j*20+5+q*5*20, i*20+5, 20, 20);
-				}
-			}
-		}
-
 	}
 
 	@Override public void keyPressed() {
@@ -51,10 +40,8 @@ class Contrapunto extends AppBase {
 				for (int j = 0; j < 4; j++) {
 					float n = 0;
 					if (modulo == q+1) n = 128;
-					myMessage.add(n);
-					myMessage.add(n);
-					myMessage.add(n);
-					myMessage.add(0);
+		      		modulos[q][i*4+j].c = color(n,n,n);
+		      		modulos[q][i*4+j].t = 0;
 				}
 			}
 			oscP5.send(myMessage, myRemoteLocation[q]);

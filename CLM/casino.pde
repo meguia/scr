@@ -73,14 +73,11 @@ class Casino extends AppBase {
 	  }
 
 	@Override public void draw() {
-	  if (lastMessage < millis() - nextMessageDelay) {
 	  	background(0);
 	  	//nextMessageDelay += 50;
 		ruleta.idle();
 		secuencia0.idle();
 	    for (int q = 0; q < 5; q++) {
-		    OscMessage myMessage = new OscMessage("/setColor/0/elements/");
-		    myMessage.add(0);
 	        for (int j = 0; j < 4; j++) {
 		      for (int i = 0; i < 5; i++) {
 			      	int n = 0; 
@@ -92,38 +89,26 @@ class Casino extends AppBase {
 		      		*/
 		      		//n = secuencia0.secuencias.get(secuencia0.pos)[j][i]*255;
 		      		if (!habilitado[q]) {
-		      			myMessage.add(0);
-		      			myMessage.add(0);
-		      			myMessage.add(0);
-		      			myMessage.add(0);
+			      		modulos[q][i*4+j].c = color(0);
+			      		modulos[q][i*4+j].t = 100;
 		      		} else {
 			      		if (q == 0 || q == 4) n  = ruleta.valores[j][i];
 			      		else n = secuencia0.secuencias.get(secuencia0.pos)[j][i];
 			      		if (n == 1) {
-							fill (n*255);
-							rect(j*20+5+q*5*20, i*20+5, 20, 20);
-							myMessage.add(n*255);
-							myMessage.add(n*255);
-							myMessage.add(n*255);
-							myMessage.add(10);
+				      		modulos[q][i*4+j].c = color(n*255);
+				      		modulos[q][i*4+j].t = 10;
 						} else {
 							int r = (int)random(upperLevelRandom);
 							int g = (int)random(upperLevelRandom);
 							int b = (int)random(upperLevelRandom);
-							myMessage.add(r);
-							myMessage.add(g);
-							myMessage.add(b);
-							myMessage.add(10);
-							fill (r*10,g*10,b*10);
-							rect(j*20+5+q*5*20, i*20+5, 20, 20);
+				      		modulos[q][i*4+j].c = color(r,g,b);
+				      		modulos[q][i*4+j].t = 10;
 						}
 					}
 				}
 	      }
-	      oscP5.send(myMessage, myRemoteLocation[q]);
 	    }
-	    lastMessage = millis();
-	  }		
+	    sendMessage = true;
 	}
 
 	@Override public void keyPressed() {

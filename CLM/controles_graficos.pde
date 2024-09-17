@@ -74,17 +74,39 @@ void initControladores() {
 
 
   }	
-	cp5.addButton("enviar_data")
-	 .setCaptionLabel("Enviar colores")
-	 .setPosition(10,270)
-	 .setSize(100,19)
-	 .setValue(0)
-	 .onRelease(new CallbackListener() { // add the Callback Listener to the button 
-	        public void controlEvent(CallbackEvent theEvent) {
-	        	sendMessage = true;
-	        }
-	      }
-	  )
+	 cp5.addSlider("messageDelay")
+     	.setPosition(210,310)
+     	.setRange(100,500)
+      .setValue(250)
+     ;
+
+	 cp5.addSlider("brillo")
+     	.setPosition(10,310)
+     	.setRange(0,255)
+      .setValue(255)
+     ;
+   cp5.addSlider("multiplicadorDelay")
+      .setLabel("Multiplicador del delay")
+      .setPosition(10,410)
+      .setRange(0,255)
+      .setValue(255)
+     ;
+	 cp5.addSlider("timeDelay")
+     	.setPosition(10,260)
+     	.setRange(0,255)
+     	.setCaptionLabel("Tiempo en milis que tarda en cambiar")
+     ;
+     cp5.addButton("enviar_data")
+	 	.setCaptionLabel("Enviar colores")
+		 .setPosition(10,270)
+		 .setSize(100,19)
+		 .setValue(0)
+		 .onRelease(new CallbackListener() { // add the Callback Listener to the button 
+		        public void controlEvent(CallbackEvent theEvent) {
+		        	sendMessage = true;
+		        }
+		      }
+		  )
 	 ;    
 	cp5.addTextfield("nombre_configuracion")
      .setPosition(10,370)
@@ -105,17 +127,79 @@ void initControladores() {
 	  )
 	 ; 
 
-  getConfigurationList();
   cp5.addScrollableList("loadConfiguraciones")
      .setPosition(500, 300)
      .setSize(200, 100)
      .setBarHeight(20)
      .setItemHeight(20)
-     .addItems(filenames)
      .setLabel("Cargar configuracion")
      // .setType(ScrollableList.LIST) // currently supported DROPDOWN and LIST
-     ;
+     ;  
+     getConfigurationList();
+
+   cp5.addTextlabel("escenas")
+                    .setText("1 - Intro\n2 - Laberinto\n3 - Contrapunto\n4 - Casino\n5 - Fuego")
+                    .setPosition(700, 300)
+                    .setColorValue(0xffffff00)
+                    ;
+    cp5.addButton("set_strobo_to")
+    .setCaptionLabel("Color destino strobo")
+     .setPosition(width-120,height-30)
+     .setSize(100,19)
+     .setValue(0)
+     .onRelease(new CallbackListener() { // add the Callback Listener to the button 
+            public void controlEvent(CallbackEvent theEvent) {
+              ColorWheel w = (ColorWheel)cp5.get("colorWheel");
+              stroboToColor = w.getRGB();
+              
+            }
+          }
+      )
+   ;  
+   cp5.addButton("set_all_colores")
+    .setCaptionLabel("Enviar color a todos")
+     .setPosition(850,250)
+     .setSize(100,19)
+     .setValue(0)
+     .onRelease(new CallbackListener() { // add the Callback Listener to the button 
+            public void controlEvent(CallbackEvent theEvent) {
+              ColorWheel w = (ColorWheel)cp5.get("colorWheel");
+              for (int i = 0; i < 6; i++) rellenarModulo(i);
+              
+            }
+          }
+      )
+   ;   
+   cp5.addTextlabel("Cristal Lights Manager 1.0")
+                    .setText("Cristal Lights Manager 1.0")
+                    .setPosition(width/2, height-20)
+                    .setColorValue(0xffffffff)
+                    ; 
+
 }
+
+void brillo(int b) {
+  brillo = b;
+  sendMessage = true;
+}
+
+void multiplicadorDelay(int md) {
+  multiplicadorDelay = md;
+}
+
+void messageDelay(int md) {
+	messageDelay = md;
+}
+
+void timeDelay(int n) {
+	timeDelay = n;
+	for (int q = 0; q < 6; q++) {
+		for (int i = 0; i < 20; i++) {
+			modulos[q][i].t = n;
+		}
+	}
+}
+
 
 void loadConfiguracion() {
 	/*String fn = cp5.get(ScrollableList.class, "configuraciones")
@@ -134,21 +218,13 @@ void loadConfiguraciones(int n) {
   for (int q = 0; q < 6; q++) 
   	for (int i = 0; i < 20; i++) {
   		modulos[q][i].c = color(
-  			Integer.parseInt(valuesJSON.getString(idx)),
-  			Integer.parseInt(valuesJSON.getString(idx+1)),
-  			Integer.parseInt(valuesJSON.getString(idx+2)));
-  		idx += 3;
+  			(valuesJSON.getInt(idx)),
+  			(valuesJSON.getInt(idx+1)),
+  			(valuesJSON.getInt(idx+2)));
+  		modulos[q][i].t = valuesJSON.getInt(idx+3);
+  		idx += 4;
   	}
-  
-  /* here an item is stored as a Map  with the following key-value pairs:
-   * name, the given name of the item
-   * text, the given text of the item by default the same as name
-   * value, the given value of the item, can be changed by using .getItem(n).put("value", "abc"); a value here is of type Object therefore can be anything
-   * color, the given color of the item, how to change, see below
-   * view, a customizable view, is of type CDrawable 
-   */
-  
- 
+
 }
 
 void saveConfiguracion() {
@@ -164,15 +240,17 @@ void saveConfiguracion() {
 				/*valores[i*20*3+j*3+0] = (int)red(modulos[i][j].c);
 				valores[i*20*3+j*3+1] = (int)green(modulos[i][j].c);
 				valores[i*20*3+j*3+2] = (int)blue(modulos[i][j].c);*/
-				valores += "\"" +(int)red(modulos[i][j].c) + "\",";
-				valores += "\"" +(int)green(modulos[i][j].c) + "\",";
-				valores += "\"" +(int)blue(modulos[i][j].c) + "\",";
+				valores += (int)red(modulos[i][j].c) + ",";
+				valores += (int)green(modulos[i][j].c) + ",";
+				valores += (int)blue(modulos[i][j].c) + ",";
+				valores += (int)modulos[i][j].t + ",";
 			}
-		valores += "\"\"]";
+		valores += "0]";
 
 		JSONArray data = parseJSONArray(valores);
 		saveJSONArray(data, fn);
 	}
+	getConfigurationList();
 }
 
 
@@ -231,7 +309,7 @@ void getConfigurationList() {
   // but you can list any directory you like.
   String path = sketchPath();
   filenames = listFileNames(sketchPath()+"/data/");
-
+  cp5.get(ScrollableList.class, "loadConfiguraciones").setItems(filenames);
 }
 
 // This function returns all the files in a directory as an array of Strings  

@@ -31,10 +31,7 @@ class Fuego extends AppBase {
 
 	@Override public void draw() {
 	  offset += 0.1;
-	  if (lastMessage < millis() - 150) {
 	    for (int q = 0; q < 6; q++) {
-		    OscMessage myMessage = new OscMessage("/setColor/0/elements/");
-		    myMessage.add(0);
 	      for (int i = 0; i < 5; i++) {
 	        for (int j = 0; j < 4; j++) {
 	          float n = noise(i+offset, j+offset+q*5);
@@ -42,19 +39,12 @@ class Fuego extends AppBase {
 	          else if (q == 1 || q == 3) n *= 32;
 	          else n*= 16;
 	          n = (int)((float)n*nivelLuz);
-	          myMessage.add(n);
-	          myMessage.add(n*.5);
-	          myMessage.add(0);
-	          myMessage.add(10);
-
-	          fill(n*1, 0, n);
-	          rect(j*20+5+q*5*20, i*20+5, 20, 20);
+	      		modulos[q][i*4+j].c = color(n,n*.5,0);
+	      		modulos[q][i*4+j].t = 10;
 	        }
 	      }
-	      oscP5.send(myMessage, myRemoteLocation[q]);
 	    }
-	    lastMessage = millis();
-	  }		
+	    sendMessage = true;
 	}
 @Override public void keyPressed() {
 		if (!inPlay) return;

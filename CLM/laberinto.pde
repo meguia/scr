@@ -1,11 +1,55 @@
 class Laberinto extends AppBase {
+  int idx;
+  int nextChange;
+  public Laberinto(PApplet parentApplet, int _id) {
+    super(parentApplet,_id);
+  }
+
+
+  @Override public void start() { 
+      inPlay = true;
+    /* Todo lo que se tiene que inicializar cuando empieza la escena */
+      println("Start Laberinto");
+      nextChange = 0;
+      idx = 0;
+  }
+
+
+  @Override
+    public void stop() {
+      println("Laberinto stopped...!");
+      inPlay = false;
+    }
+
+  @Override public void draw() {
+    if (millis() > nextChange) {
+      nextChange = millis() + 300;
+      idx++;
+      if (idx > 20) idx = 0;
+      for (int q = 0; q < 5; q++) {
+        for (int j = 0; j < 20; j++) {
+          int n = 0;
+          if (idx == q*5+j%5) n = 255;
+          modulos[q][j].c = color(n);
+          modulos[q][j].t = 100;
+
+        }
+      }
+      sendMessage = true;
+    }
+  }
+}
+
+
+
+class LaberintoOld extends AppBase {
   int cx, cy;
   int [][] mapa = new int[20][5];
   boolean changed = false;
   boolean automatico;
   int moveDelay, nextMove;
 
-  public Laberinto(PApplet parentApplet, int _id) {
+  public LaberintoOld(PApplet parentApplet, int _id) {
     super(parentApplet,_id);
   }
 

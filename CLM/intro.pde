@@ -11,7 +11,7 @@ class Intro extends AppBase {
 	    inPlay = true;
     /* Todo lo que se tiene que inicializar cuando empieza la escena */
     	println("Start Intro");
-    	sendLevels();
+    	sendMessage = true;
     	whiteLevel = 0;
     	habilitado[0] = true;
     	habilitado[1] = true;
@@ -22,22 +22,23 @@ class Intro extends AppBase {
   }
 
   void sendLevels() {
+		ColorWheel w = (ColorWheel)cp5.get("colorWheel");
+		color col = w.getRGB();
+		pushStyle();
+		colorMode(HSB,255);
+		col = color(hue(col),saturation(col),min(whiteLevel,brightness(col)));
+		popStyle();
 	    for (int q = 0; q < 6; q++) {
-	    OscMessage myMessage = new OscMessage("/setColor/0/elements/");
-	    myMessage.add(0);
 	      for (int i = 0; i < 5; i++) {
 	        for (int j = 0; j < 4; j++) {
 	        	int n;
-	      		if (habilitado[q]) n = whiteLevel;
-	      		else n = 0;
-	          myMessage.add(n);
-	          myMessage.add(n);
-	          myMessage.add(n);
-	          myMessage.add(100);
+	      		if (habilitado[q]) modulos[q][i*4+j].c  = col;
+	      		else modulos[q][i*4+j].c = color(0);
+	      		modulos[q][i*4+j].t = 100;
 	        }
 	      }
-	      oscP5.send(myMessage, myRemoteLocation[q]);
 	    }    	
+	    sendMessage = true;
   }
 
   @Override
@@ -47,18 +48,6 @@ class Intro extends AppBase {
 	  }
 
 	@Override public void draw() {
-		background(0);
-	    for (int q = 0; q < 5; q++) {
-	        for (int j = 0; j < 4; j++) {
-		      for (int i = 0; i < 5; i++) {
-		      		if (habilitado[q]) fill (whiteLevel*2);
-		      		else fill(0);
-					rect(j*20+5+q*5*20, i*20+5, 20, 20);
-				}
-			}
-		}
-	  fill(255);
-	  text("Intro / Todos los módulos\nen blanco controlable\nUP - Subir blanco\nDOWN - Bajar blanco", width-210, height-220);
 
 	}
 	@Override public void keyPressed() {
@@ -67,17 +56,19 @@ class Intro extends AppBase {
 			whiteLevel++;
 			whiteLevel = min(255, max(0, whiteLevel));
 			println(whiteLevel);
+			sendLevels();
 		} else if (keyCode == DOWN) {
 			whiteLevel--;
 			whiteLevel = min(255, max(0, whiteLevel));
 			println(whiteLevel);
+			sendLevels();
 		} else if (key == 'w') habilitado[0] = !habilitado[0];
 		 else if (key == 'e') habilitado[1] = !habilitado[1];
 		 else if (key == 'r') habilitado[2] = !habilitado[2];
 		 else if (key == 't') habilitado[3] = !habilitado[3];
 		 else if (key == 'y') habilitado[4] = !habilitado[4];
 		 else if (key == 'u') habilitado[5] = !habilitado[5];
-		sendLevels();
+		
 	}	
 }
 
