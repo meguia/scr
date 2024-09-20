@@ -13,6 +13,7 @@ En cada uno de los modulos (y en Iris), corre cristal_osc_i2c como un servicio q
 
 ### control_readconfig 
 se carga en el master y tiene varias funciones para armar, almacenar y enviar configuraciones por OSC
-...
+
+
 
  
