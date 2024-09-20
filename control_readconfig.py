@@ -184,4 +184,5 @@ def make_conf(value, nid, nseq=None, clase='same', mod = 0, tipo='trg'):
             for r in range(5):
                 npdata[m][r:20:10] = value[2*r]
                 npdata[m][r+5:20:10] = value[2*r+1]
+    print(npdata)            
     save_conf(npdata,nid,nseq,tipo)
