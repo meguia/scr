@@ -14,6 +14,7 @@ class LED {
     int destcolors[3];
     int oricolors[3];
     unsigned long finalTime, startTime;
+    unsigned long timeMultiplier;
     boolean enUso;
     int idx;
 

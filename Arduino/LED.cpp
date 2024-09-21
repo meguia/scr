@@ -8,6 +8,7 @@ LED::LED() {
   memcpy(destcolors, colors, sizeof(int)*3);
   finalTime = 0;
   startTime = 0;
+  timeMultiplier = 1;
 }
 
 void LED::set(int dr, int dg, int db, int dtime) {
@@ -15,10 +16,10 @@ void LED::set(int dr, int dg, int db, int dtime) {
   destcolors[0] = dr;
   destcolors[1] = dg;
   destcolors[2] = db;
-  finalTime = millis() + dtime*10;
+  finalTime = millis() + dtime*timeMultiplier;
   startTime = millis();
-  char msg[256];
-  sprintf(msg, "setting led %i to r:%i g:%i b:%i in %i millis", idx, dr, dg, db, dtime);
+  //char msg[256];
+  //sprintf(msg, "setting led %i to r:%i g:%i b:%i in %i millis", idx, dr, dg, db, dtime);
 }
 
 void LED::run() {
