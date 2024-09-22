@@ -77,7 +77,7 @@ def send_config(config, nmod, tipo):
     tipo es trg pos vel acl o rgb
     """
     if nmod:
-        modlist = [iplist[n] for n in nmod]
+        modlist = [iplist[n-1] for n in nmod]
     else:
         modlist = iplist
     if type(config) == np.ndarray:
@@ -200,12 +200,15 @@ def rotate_poly(poly,theta):
         rotated_poly.append((new_x, new_y))
     return rotated_poly    
 
-def plot_config(config):
+def plot_config(config,reverse=False):
     npdata = byte_to_angle(config)
     fig = plt.subplots(figsize=(25,4.5))
     gs = gridspec.GridSpec(1, 5,wspace=0.3)
     for n in range(5):
-        ax= plt.subplot(gs[n])
+        if reverse:
+            ax= plt.subplot(gs[4-n])
+        else:
+            ax= plt.subplot(gs[n])
         for x in np.arange(4):
             for y in np.arange(5):
                 pol = rotate_poly(poly,np.radians(npdata[n][5*x+y])) + np.array([x,4-y])
@@ -217,12 +220,15 @@ def plot_config(config):
         ax.set_xticklabels([])
         ax.set_yticklabels([])
             
-def plot_configh(config):
+def plot_configh(config,reverse=False):
     npdata = byte_to_angle(config)
     fig = plt.subplots(figsize=(25,4))
     gs = gridspec.GridSpec(1, 5, wspace=0.1)
     for n in range(5):
-        ax= plt.subplot(gs[n])
+        if reverse:
+            ax= plt.subplot(gs[4-n])
+        else:
+            ax= plt.subplot(gs[n])
         for x in np.arange(5):
             for y in np.arange(4):
                 pol = rotate_poly(poly,np.radians(npdata[n][5*y+x]+90)) + np.array([x,y])
@@ -234,7 +240,28 @@ def plot_configh(config):
         ax.set_xticklabels([])
         ax.set_yticklabels([])
             
-    
+def print_configh_seq(nid,nseqs,reverse=False):
+    fig = plt.subplots(figsize=(25,4*nseqs))
+    gs = gridspec.GridSpec(nseqs, 5, wspace=0.1)
+    for nc in range(nseqs):
+        config = load_conf(nid, nseq=nc+1,tipo='trg')
+        npdata = byte_to_angle(config)
+        for n in range(5):
+            if reverse:
+                ax= plt.subplot(gs[nc,4-n])
+            else:
+                ax= plt.subplot(gs[nc,n])
+            for x in np.arange(5):
+                for y in np.arange(4):
+                    pol = rotate_poly(poly,np.radians(npdata[n][5*y+x]+90)) + np.array([x,y])
+                    poln = patches.Polygon(pol, edgecolor='black', facecolor='black', alpha=0.5)
+                    ax.add_patch(poln)
+            ax.set_xlim(-0.5, 4.5)
+            ax.set_ylim(-0.5, 3.5)
+            ax.plot([-0.45,-0.45],[-0.5,3.5],c='blue',lw=5)
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])   
+     
     
     
     
