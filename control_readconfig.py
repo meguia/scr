@@ -2,6 +2,9 @@
 """
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib import gridspec
 import json
 import time
 from npjson import *
@@ -22,6 +25,8 @@ port = 8000
 osc_tipo = {'pos':'/setPosition/', 'trg':'/setTarget/', 'vel':'/setVelocity/', 'acl':'/setAcceleration/', 'rgb':'/setColor/'}
 file_tipo = {'pos':'trg', 'trg':'trg', 'vel':'vel', 'acl':'acl', 'rgb':'rgb'}
 path = './data/' 
+# polygon
+poly = 0.5*np.array([(0.5,0.5),(-0.5,0.5),(-0.5,-0.5),(-0.35,-0.5),(-0.35,0.35),(0.35,0.35),(0.35,-0.5),(0.5,-0.5)])
 
 def byte_to_angle(value):
     return np.rint(90*(value-128)/86).astype(int)
@@ -56,7 +61,7 @@ def load_conf(nid, nseq=None, tipo= 'trg'):
     with open(fname) as json_file:  
         npdata = json.load(json_file, object_hook=json_numpy_obj_hook)
         #perform someformat chequeo 
-    return npdata
+    return np.copy(npdata)
 
 def print_conf(nid, nmod=0, nseq=None, tipo='trg'):
     npdata = load_conf(nid,nseq,tipo)
@@ -183,6 +188,54 @@ def make_conf(value, nid, nseq=None, clase='same', mod = 0, tipo='trg'):
         elif clase == 'row12':
             for r in range(5):
                 npdata[m][r:20:10] = value[2*r]
-                npdata[m][r+5:20:10] = value[2*r+1]
-    print(npdata)            
+                npdata[m][r+5:20:10] = value[2*r+1]          
     save_conf(npdata,nid,nseq,tipo)
+    
+def rotate_poly(poly,theta):
+    rotated_poly = []
+    for vertex in poly:
+        x, y = vertex
+        new_x = x * np.cos(theta) - y * np.sin(theta)
+        new_y = x * np.sin(theta) + y * np.cos(theta)
+        rotated_poly.append((new_x, new_y))
+    return rotated_poly    
+
+def plot_config(config):
+    npdata = byte_to_angle(config)
+    fig = plt.subplots(figsize=(25,4.5))
+    gs = gridspec.GridSpec(1, 5,wspace=0.3)
+    for n in range(5):
+        ax= plt.subplot(gs[n])
+        for x in np.arange(4):
+            for y in np.arange(5):
+                pol = rotate_poly(poly,np.radians(npdata[n][5*x+y])) + np.array([x,4-y])
+                poln = patches.Polygon(pol, edgecolor='black', facecolor='black', alpha=0.5)
+                ax.add_patch(poln)
+        ax.set_xlim(-0.5, 3.5)
+        ax.set_ylim(-0.5, 4.5)
+        ax.plot([-0.5,3.5],[4.45,4.45],c='blue',lw=5)
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+            
+def plot_configh(config):
+    npdata = byte_to_angle(config)
+    fig = plt.subplots(figsize=(25,4))
+    gs = gridspec.GridSpec(1, 5, wspace=0.1)
+    for n in range(5):
+        ax= plt.subplot(gs[n])
+        for x in np.arange(5):
+            for y in np.arange(4):
+                pol = rotate_poly(poly,np.radians(npdata[n][5*y+x]+90)) + np.array([x,y])
+                poln = patches.Polygon(pol, edgecolor='black', facecolor='black', alpha=0.5)
+                ax.add_patch(poln)
+        ax.set_xlim(-0.5, 4.5)
+        ax.set_ylim(-0.5, 3.5)
+        ax.plot([-0.45,-0.45],[-0.5,3.5],c='blue',lw=5)
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+            
+    
+    
+    
+    
+    
