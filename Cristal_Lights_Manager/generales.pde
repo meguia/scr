@@ -1,4 +1,5 @@
 JSONArray configuracion;
+String[] filenames;
 
 void loadDefaults() {
   try {

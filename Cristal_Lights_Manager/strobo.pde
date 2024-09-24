@@ -24,7 +24,7 @@ class Strobo {
 		if (continousStrobe && !inUse) strobo();
 		if (inUse && millis() > final_strobo) {
 		    for (int i = 0; i < 20; i++) {
-		        modulos[cristalIdx][i].c = color(0);
+		        modulos[cristalIdx][i].c = stroboToColor;
 		        modulos[cristalIdx][i].t = 0;
 		    }
 		    sendMessage = true;

@@ -14,8 +14,6 @@ import java.util.*;
 OscP5 oscP5;
 NetAddress [] myRemoteLocation = new NetAddress[6];
 ControlP5 cp5;
-String[] filenames;
-
   
 PGraphics columnasMouseChecker,columnasGraphics;
 
