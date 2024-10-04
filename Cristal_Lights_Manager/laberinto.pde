@@ -17,21 +17,22 @@ class Laberinto extends AppBase {
 
   @Override
     public void stop() {
-      println("Laberinto stopped...!");
+      println("Laberinto stopped...!!");
       inPlay = false;
     }
 
-  @Override public void draw() {
+  @Override
+    public void draw() {
     if (millis() > nextChange) {
       nextChange = millis() + 300;
       idx++;
-      if (idx > 20) idx = 0;
+      if (idx > 24) idx = 0;
       for (int q = 0; q < 5; q++) {
         for (int j = 0; j < 20; j++) {
           int n = 0;
           if (idx == q*5+j%5) n = 255;
           modulos[q][j].c = color(n);
-          modulos[q][j].t = 100;
+          modulos[q][j].t = 1;
 
         }
       }
@@ -40,7 +41,7 @@ class Laberinto extends AppBase {
   }
 }
 
-
+/*
 
 class LaberintoOld extends AppBase {
   int cx, cy;
@@ -56,7 +57,6 @@ class LaberintoOld extends AppBase {
 
   @Override public void start() { 
       inPlay = true;
-    /* Todo lo que se tiene que inicializar cuando empieza la escena */
       println("Start Laberinto");
       cx = 0;
       cy = 0;  
@@ -67,16 +67,21 @@ class LaberintoOld extends AppBase {
       }
       moveDelay = 250;
       nextMove = 0;
-      automatico = true;
+      automatico = false;
   }
 
   @Override
     public void stop() {
-      println("Laberinto stopped...!");
+      println("Laberinto stopped...!!");
       inPlay = false;
     }
 
+  @Override public void idle() {
+    println("Idle Laberinto");
+  }
+
   @Override public void draw() {
+    println(automatico);
     if (millis() > nextMove || changed) {
       nextMove = millis() + moveDelay;
       if (automatico) movePos();
@@ -105,7 +110,7 @@ class LaberintoOld extends AppBase {
         myMessage.add(30);
       }
     }
-    oscP5.send(myMessage, myRemoteLocation[cristalIdx]);
+    sendOSCMessage(myMessage, myRemoteLocation[cristalIdx], false);
   }
 
   void movePos() {
@@ -144,5 +149,5 @@ class LaberintoOld extends AppBase {
   }
 
 }
-
+*/
 

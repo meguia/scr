@@ -39,13 +39,14 @@ class Contrapunto extends AppBase {
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 4; j++) {
 					float n = 0;
-					if (modulo == q+1) n = 128;
+					if (modulo == q+1) n = 255;
 		      		modulos[q][i*4+j].c = color(n,n,n);
 		      		modulos[q][i*4+j].t = 0;
 				}
 			}
-			oscP5.send(myMessage, myRemoteLocation[q]);
-	    }   		
+			//sendOSCMessage(myMessage, myRemoteLocation[q], true);
+			sendMessage = true;
+	    }			
 	}
 
 }

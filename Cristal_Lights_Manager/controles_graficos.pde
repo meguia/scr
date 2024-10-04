@@ -1,9 +1,9 @@
 void initControladores() {
 
   cp5 = new ControlP5( this );
-  cp5.addColorWheel("colorWheel" , width-250 , 10 , 200 ).setRGB(color(128,0,255));
+  cp5.addColorWheel("colorWheel" , width-250 , 10 , 200 ).setRGB(color(255,255,255));
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     for (int j = 0; j < 20; j++) {
       modulos[i][j] = new Columna(j);
     }
@@ -85,6 +85,21 @@ void initControladores() {
      	.setRange(0,255)
       .setValue(255)
      ;
+
+   cp5.addSlider("intro")
+      .setLabel("Intro")
+      .setPosition(10,330)
+      .setRange(0,255)
+      .setValue(0)
+     ;
+   cp5.getController("intro").setVisible(false);
+   cp5.addSlider("fuego")
+      .setLabel("Fuego")
+      .setPosition(10,330)
+      .setRange(0,5)
+      .setValue(0)
+     ;
+   cp5.getController("fuego").setVisible(false);
    cp5.addSlider("multiplicadorDelay")
       .setLabel("Multiplicador del delay")
       .setPosition(10,410)
@@ -164,7 +179,7 @@ void initControladores() {
      .onRelease(new CallbackListener() { // add the Callback Listener to the button 
             public void controlEvent(CallbackEvent theEvent) {
               ColorWheel w = (ColorWheel)cp5.get("colorWheel");
-              for (int i = 0; i < 6; i++) rellenarModulo(i);
+              for (int i = 0; i < 5; i++) rellenarModulo(i);
               
             }
           }
@@ -183,6 +198,24 @@ void brillo(int b) {
   sendMessage = true;
 }
 
+void intro(int b) {
+  if (escena == INTRO) {
+    Intro intro = (Intro)escenas.get(0);
+    intro.whiteLevel = b;
+    intro.sendLevels();
+
+  } 
+}
+
+void fuego(float b) {
+
+   if (escena == FUEGO) {
+    Fuego fuego = (Fuego)escenas.get(3);
+    fuego.nivelLuz = b;
+
+  }
+}
+
 void multiplicadorDelay(int md) {
   multiplicadorDelay = md;
 }
@@ -193,7 +226,7 @@ void messageDelay(int md) {
 
 void timeDelay(int n) {
 	timeDelay = n;
-	for (int q = 0; q < 6; q++) {
+	for (int q = 0; q < 5; q++) {
 		for (int i = 0; i < 20; i++) {
 			modulos[q][i].t = n;
 		}
@@ -215,7 +248,7 @@ void loadConfiguraciones(int n) {
   JSONArray valuesJSON = loadJSONArray(fn);
   int idx = 0;
 
-  for (int q = 0; q < 6; q++) 
+  for (int q = 0; q < 5; q++) 
   	for (int i = 0; i < 20; i++) {
   		modulos[q][i].c = color(
   			(valuesJSON.getInt(idx)),
@@ -235,7 +268,7 @@ void saveConfiguracion() {
 		if (fn.length() < 5 || fn.substring(fn.length()-5) != "json") fn += ".json";
 		fn = "data/"+fn;
 		String valores = "[";
-		for (int i = 0; i < 6; i++) 
+		for (int i = 0; i < 5; i++) 
 			for (int j = 0; j < 20; j++) {
 				/*valores[i*20*3+j*3+0] = (int)red(modulos[i][j].c);
 				valores[i*20*3+j*3+1] = (int)green(modulos[i][j].c);
@@ -281,7 +314,7 @@ void performeDraw(PGraphics pg, boolean setIndex) {
   pg.pushMatrix();
   pg.pushStyle();
   pg.translate(10,10);
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     pg.pushMatrix();
     pg.translate(40,50);
     pg.rotate(rotaciones[i]);

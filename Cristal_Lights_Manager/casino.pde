@@ -63,7 +63,7 @@ class Casino extends AppBase {
     	println("Start Casino");
     	nextMessageDelay = 250;
     	upperLevelRandom = 12;
-    	for (int i = 0; i < 6; i++) habilitado[i] = true;
+    	for (int i = 0; i < 5; i++) habilitado[i] = true;
   }
 
   @Override
@@ -87,22 +87,22 @@ class Casino extends AppBase {
 		      			n = secuencia0.secuencias.get(secuencia0.pos)[j][i]*255;
 		      		}
 		      		*/
-		      		//n = secuencia0.secuencias.get(secuencia0.pos)[j][i]*255;
+		      		n = secuencia0.secuencias.get(secuencia0.pos)[j][i]*255;
 		      		if (!habilitado[q]) {
 			      		modulos[q][i*4+j].c = color(0);
-			      		modulos[q][i*4+j].t = 100;
+			      		modulos[q][i*4+j].t = 0;
 		      		} else {
 			      		if (q == 0 || q == 4) n  = ruleta.valores[j][i];
 			      		else n = secuencia0.secuencias.get(secuencia0.pos)[j][i];
 			      		if (n == 1) {
 				      		modulos[q][i*4+j].c = color(n*255);
-				      		modulos[q][i*4+j].t = 10;
+				      		modulos[q][i*4+j].t = 1;
 						} else {
 							int r = (int)random(upperLevelRandom);
 							int g = (int)random(upperLevelRandom);
 							int b = (int)random(upperLevelRandom);
 				      		modulos[q][i*4+j].c = color(r,g,b);
-				      		modulos[q][i*4+j].t = 10;
+				      		modulos[q][i*4+j].t = 1;
 						}
 					}
 				}

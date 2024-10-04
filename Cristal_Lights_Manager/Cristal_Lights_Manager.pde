@@ -53,9 +53,9 @@ void setup() {
     columnasMouseChecker = createGraphics(width,height);
     columnasGraphics = createGraphics(width,height);
     println("["+inetAddress.getHostAddress().substring(0,9)+"]");
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 5; i++) {
        //
-      if (inetAddress.getHostAddress().substring(0,9).equals("192.168.0")) {
+      if (inetAddress.getHostAddress().substring(0,9).equals("192.168.0") || true) {
         myRemoteLocation[i] = new NetAddress("192.168.0.1"+str(i+1), 8000);
         println("Modulo " + i + " : " + "192.168.0.1"+str(i+1));
       } else {
@@ -92,7 +92,6 @@ void processMessages() {
     for (int q = 0; q < modulos.length-1; q++) {
       OscMessage myMessage = new OscMessage("/setColor/"+(q+1)+"/elements/");
       myMessage.add(0);
-
       for (int i = 0; i < 20; i++) {
           color c = modulos[q][i].c;
           pushStyle();
@@ -106,7 +105,7 @@ void processMessages() {
           myMessage.add(modulos[q][i].t);
       }
       if (multiplicadorDelay > 0) myMessage.add(multiplicadorDelay);
-      oscP5.send(myMessage, myRemoteLocation[q]);     
+      sendOSCMessage(myMessage, myRemoteLocation[q], false);
       //println("Enviando " + myMessage + " a " + myRemoteLocation[q]); 
     }
     lastMessage = millis();
@@ -157,7 +156,7 @@ void draw() {
     else if (key == 'h')  { strobos[2].strobo();  }
     else if (key == 'j')  { strobos[3].strobo();  }
     else if (key == 'k')  { strobos[4].strobo();  }
-    else if (key == 'l')  { strobos[5].strobo();  }
+    //else if (key == 'l')  { strobos[5].strobo();  }
     }
   }
 
@@ -168,7 +167,7 @@ void draw() {
   popStyle();
 
 
-  for (int i = 0; i < 6; i++) strobos[i].draw();
+  for (int i = 0; i < 5; i++) strobos[i].draw();
   processMessages();
 
 
@@ -187,7 +186,6 @@ void keyPressed() {
   else if (key == 'h')  { strobos[2].strobo();  }
   else if (key == 'j')  { strobos[3].strobo();  }
   else if (key == 'k')  { strobos[4].strobo();  }
-  else if (key == 'l')  { strobos[5].strobo();  }
   else if (key == ' ')  { sendStop(); }
   else {
     if (escena > -1) {
@@ -206,8 +204,9 @@ void sendStop() {
     OscMessage myMessage = new OscMessage("/stopLeds/");
     myMessage.add(0);
     for (int i = 0; i < 20; i++) myMessage.add(0);
-    for (int q = 0; q < 6; q++) {
-	      oscP5.send(myMessage, myRemoteLocation[q]);
+    for (int q = 0; q < 5; q++) {
+        sendOSCMessage(myMessage, myRemoteLocation[q], true);
+
 	 }
 }
 
